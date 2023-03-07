@@ -1,128 +1,91 @@
 #include <iostream>
 
-// variables and functions and scope
-// local, global, static variables
-// free, member, static functions
-// static attributes
+// core language definitions:
+// - l-value / r-value
+// - chain assignment
+// - constness: east/west const, pointers and const
+// using / namespaces
 
-// methods vs functions + this pointer
-
-// OBJECT
-// ctor/dtor
-// copy-ctor, copy-assignment
-// move-ctor, move-assignment
+// OOP:
 // inheritance
+// dynamic polymorphism / virtual functions vs RTTI
+// move-ctor, move-assignment
 
-// function / operator overloading
-// almost always auto - aaa rule: move type to the right
-// unified/universal initialization
+// functional programming:
+// - overloading
+//   (all the operators are implemented as functions and they also can ve overloaded)
+
+// Generics / Templates:
+// function, class, variable, type templates
 
 #include <iostream>
-#include "movie.h"
-#include "extended_movie.h"
+#include <string>
 
-// global variable that holds an integer number
-int a = 10;
+using namespace std;
 
-int genre_type = 0; // 0 == Comedy, 1 == Drama, 2 == Action
+//struct string {
+//    // ....
+//    string() { }
+//    string(const char*) { } // conversion ctor
+//    string(const string&) { }
+//    // ....
+//};
 
-int Movie::count = 0;
 
+//int foo(std::string& s) // l-value ref
 
-Movie::Movie(GenreType genre, int year) : genre(genre), year(year)
+void bar(const string& s)
 {
-    std::cout << "Movie ctor got called." << std::endl;
-    count++;
 
-//    this->genre = genre;
-//    this->year = year;
 }
 
-Movie::~Movie()
+int foo(const string& s) // l-value or r-value ref (because of constness)
 {
-    std::cout << "Movie dtor got called." << std::endl;
-    count--;
+    bar(s);
+    cout << s << endl;
+    return 5;
 }
 
-Movie::Movie(const Movie& other) : genre(other.genre), year(other.year)
+void print(int& k)
 {
-//    other.year = 1900;
-    count++;
-    std::cout << "Movie's copy-ctor got called." << std::endl;
+    cout << k << endl;
 }
-
-
-
-
-
-void Movie::print() // not a free-function, this is a method belonging to Movie type
-{
-    // "this" variable is actually the memory address of the instance
-    this->year = 2021;
-    std::cout << "Genre=" << (int)this->genre << ", Year=" << this->year << std::endl;
-}
-
-
-void print(Movie* p) // free-function
-{
-    p->year = 2021;
-    std::cout << "Genre=" << (int)p->genre << ", Year=" << p->year << std::endl;
-}
-
-
-void run() // free function (independent of an object, doesn't belong to an object)
-{
-    static bool initialized = false;
-
-    if(!initialized)
-    {
-        initialized = true;
-        std::cout << "Initializing..." << std::endl;
-    }
-
-    std::cout << "run() function is called." << std::endl;
-
-    static int value = 0;
-    value++;
-    std::cout << "value=" << value << std::endl;
-
-    Movie m_drama(GenreType::Drama, 1978);
-    std::cout << "number of movie instances after m_drama = " << Movie::count << std::endl;
-    //    m_drama.genre = GenreType::Drama;
-    //    m_drama.year = 1978;
-
-//    Movie m_drama_copy(m_drama.genre, m_drama.year);
-    Movie m_drama_copy(m_drama); // copy c-tor.
-    // Movie::count becomes 2
-
-
-    Movie m_comedy(GenreType::Comedy, 2002);
-    std::cout << "number of movie instances after m_comedy = " << Movie::count << std::endl;
-
-//    m_drama_copy.operator=(m_comedy);
-//    m_drama_copy = m_comedy;
-
-    print(&m_drama);
-    m_drama.print();
-
-    std::cout << "m_drama.year=" << m_drama.year << std::endl;
-
-    print(&m_comedy);
-    m_comedy.print();
-}
-
-
 
 int main(int argc, char* argv[])
 {
-    int a = 100;
-    a = 200;
+    int a, b, c; //c style variable definition; it allows uninitialized variables
+    a = b = c = 5; // assignment operator runs from right to left
+    // a, b and c are 5
 
-    std::cout << a << std::endl;
-    std::cout << ::a << std::endl;
+    print(a = b = c = 50); // prints 50
 
-    run();
-    run();
+    // - constness: east/west const, pointers and const
+
+    double PI = 3.14; // east-const: double is readonly (value which is double is readonly)
+    double G = 9.8;
+
+//    double const * const PIptr = &PI; // east const
+    const double * const PIptr = &PI; // west const - east const mixed. only the first const can be written at left
+
+//    PIptr = &G; // trying to change the memory address stored in this pointer is not allowed (double * const)
+//    *PIptr = G;
+
+    cout << "address of PI = " << &PI << endl;
+    cout << "stored value in PIptr = " << PIptr << endl;
+    cout << "stored value in the memory being pointed by PIptr = " << *PIptr << endl;
+
+    cout << sizeof(PI) << endl;
+
+
+
+
+    // l-value ---> left value
+    // r->value --> right value
+
+//    auto a = 5;   // a --> l-value;    5 --> r-value
+
+    foo( "Hi there" ); // const char[9] --> const char * ---> std::string
+    5;
 
     return 0;
 }
