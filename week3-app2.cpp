@@ -1,78 +1,93 @@
 #include <iostream>
 
-// repeat-it algorithm
+// core language definitions:
+// - l-value / r-value
+// - chain assignment
+// - constness: east/west const, pointers and const
+// using / namespaces
 
-// function objects
-// l-value, r-value, r-value binding reference
+// OOP:
+// inheritance
+// dynamic polymorphism / virtual functions vs RTTI
 
-// move-ctor, move-assignment
+// move-ctor, move-assignment (delayed)
+
+// functional programming:
+// - overloading
+//   (all the operators are implemented as functions and they also can ve overloaded)
+
+// Generics / Templates:
+// function, class, variable, type templates
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 
-
-void real_job()
+namespace Util
 {
-    cout << "Job done" << endl;
+int A = 100;
 }
 
-struct AnotherRealJob
+
+struct Animal // creating its own namespace called Animal
 {
-    int i; // construction parameter
+    string name; // 32 byte consuming thing
+    Animal(const string& name = "") : name(name) { } // binds l-values and r-values
 
-    AnotherRealJob(int i) : i(i) { }
-
-    int operator()() const
-    {
-        return i*10;
+    virtual void whoAmI() { // #index 0
+        cout << "Arbitrary Animal with name '" << name << "'" << endl;
     }
 };
 
-struct FancyRealJob
+// Animal's vtable there will be only 1 virtual function: Animal::whoAmI
+
+struct Dog : Animal
 {
-    string s; // construction parameter
+    string familyName;
+//    using Animal::Animal;
 
-    FancyRealJob(string s) : s(s) { }
+    Dog(const string& name = "", const string& familyName = "") : Animal(name), familyName(familyName) { } // binds l-values and r-values
 
-    string operator()() const
-    {
-        return s;
+    void whoAmI() override { // override'ing: exact signature method is already available, we override it
+        cout << "Dog with name '" << name << "'. My family is '" << familyName << "'" << endl;
     }
 };
 
-
-typedef void (*FunctionPtr)(); // cstyle
-//using FunctionPtr = void (*)();
-
-typedef int (*FunctionPtr2)(int); // cstyle
-
-template<typename FuncObject>
-void repeat_it(const FuncObject& func, int times) // l-value + r-value binding ref
+struct Shark : Animal
 {
-    for(int i=0; i<times; i++) {
-        cout << func() << endl;
-    }
-}
+    using Animal::Animal;
 
-template<typename FuncObject>
-void repeat_it(FuncObject& func, int times) // l-value binding ref
-{
-    for(int i=0; i<times; i++) {
-        cout << func() << endl;
+    void whoAmI() override { // override'ing: exact signature method is already available, we override it
+        cout << "Shark with name '" << name << "'" << endl;
     }
-}
+};
+
 
 int main(int argc, char* argv[])
 {
-//    repeat_it(&real_job, 10);
+//    using Util::A;
+//    cout << A << endl;
 
-//    auto another_real_job = [i=100]() { return i * 10; };
+    auto a = Animal{"Poppy"};
+    cout << sizeof(a) << endl;
+//    a.whoAmI();
 
-    auto x = [i=100]() mutable {
-        i++;
-        return i * 10;
-    };
-    repeat_it(x, 3);
+    auto d = Dog{"Poppy", "Adams"};
+//    d.whoAmI();
 
-//    repeat_it(AnotherRealJob{100}, 3);
-//    repeat_it(FancyRealJob{"Hi"}, 2);
+    auto s = Shark{"Cuty"};
+//    s.whoAmI();
+
+    using AnimalPtr = Animal*;
+    AnimalPtr animals[] = {&a, &d, &s, &s, &d};
+    // at compile time, I created this array, I know it contains 4 items
+
+    const auto numItems = sizeof(animals) / sizeof(AnimalPtr);
+    for(int i=0; i<numItems; i++) {
+//        (*animals[i]).whoAmI();
+        animals[i]->whoAmI();
+    }
+
+    return 0;
 }

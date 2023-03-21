@@ -1,129 +1,91 @@
 #include <iostream>
 
-// operator overloading
-// function-call operator
-// function objects
-// function pointers
+// core language definitions:
+// - l-value / r-value
+// - chain assignment
+// - constness: east/west const, pointers and const
+// using / namespaces
 
-// getter, setter
-// returning a reference
-// l-value, r-value, r-value binding reference
-// repeat-it algorithm
-
+// OOP:
+// inheritance
+// dynamic polymorphism / virtual functions vs RTTI
 // move-ctor, move-assignment
+
+// functional programming:
+// - overloading
+//   (all the operators are implemented as functions and they also can ve overloaded)
+
+// Generics / Templates:
+// function, class, variable, type templates
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 
-struct Foo
-{
-private:
-    int a = 10;
-    float f = 12.3f;
-
-public:
-    int getInt() { return a; }
-    int& getIntRef() { return a; }
-    int* getIntPtr() { return &a; }
-    Foo()// : a{20}, f{12.3f}
-    {    }
-    Foo(int a) : a{a}, f{float(a)}
-    {    }
-    Foo(int a, float f) : a{a}, f{f}
-    {    }
-    // copy ctor
-    Foo(const Foo& other) : a{other.a}, f{other.f}
-    {    }
-
-    void operator() () {
-        cout << "I am Foo instance, and I am being called as if I am a function." << endl;
-    }
-
-    // left is binding only to l-values,
-    // right can bind to both l-value and r-value
-    void operator=(const Foo& right) // copy assignment
-    {
-        a = right.a;
-        f = right.f;
-    }
-
-    void operator=(int k) // copy assignment
-    {
-        a = k;
-        f = k;
-    }
+//struct string {
+//    // ....
+//    string() { }
+//    string(const char*) { } // conversion ctor
+//    string(const string&) { }
+//    // ....
+//};
 
 
-    void print()
-    {
-        cout << "I am foo with values (a, f)=" << a << "," << f << endl;
-    }
-};
+//int foo(std::string& s) // l-value ref
 
-//int* getIntPtr(Foo& foo) { return &foo.a; }
-
-//int operator+(string a, string b) {
-//    return a.size() + b.size();
-//}
-
-void nothing()
-{
-}
-
-struct Bar {
-    int a;
-    float f;
-    double d;
-    string s;
-
-
-    void operator()(char c)
-    {
-
-    }
-};
-
-void func(int a, float f, double d, string s, char c)
+void bar(const string& s)
 {
 
 }
 
+int foo(const string& s) // l-value or r-value ref (because of constness)
+{
+    bar(s);
+    cout << s << endl;
+    return 5;
+}
 
-
+void print(int& k)
+{
+    cout << k << endl;
+}
 
 int main(int argc, char* argv[])
 {
-    4 + 5;     // in-fix notation
+    int a, b, c; //c style variable definition; it allows uninitialized variables
+    a = b = c = 5; // assignment operator runs from right to left
+    // a, b and c are 5
 
-    cout << sizeof(Foo) << endl;
+    print(a = b = c = 50); // prints 50
 
-    auto foo = Foo{}; // default ctor
-    foo.print();
+    // - constness: east/west const, pointers and const
 
-//    auto foo2 = Foo(foo); // copy ctor
-    auto foo2 = foo; // copy ctor
-    foo2 = Foo{100, 3.14f}; // copy assignment
-    foo2 = 200; // copy assignment
-    foo2.print();
-    auto foo3 = Foo{300};
+    double PI = 3.14; // east-const: double is readonly (value which is double is readonly)
+    double G = 9.8;
 
-    cout << "foo3.getInt() is " << foo3.getInt() << endl;
-//    foo3.getInt() = 400; // left hand side is now an r-value
-    foo3.getIntRef() = 400; // left hand side is now an r-value
-    cout << "foo3.getInt() is " << foo3.getInt() << endl;
+//    double const * const PIptr = &PI; // east const
+    const double * const PIptr = &PI; // west const - east const mixed. only the first const can be written at left
 
-    *(foo3.getIntPtr()) = 400; // left hand side is now an r-value
+//    PIptr = &G; // trying to change the memory address stored in this pointer is not allowed (double * const)
+//    *PIptr = G;
 
-    foo3();
-//    foo3.operator()();
+    cout << "address of PI = " << &PI << endl;
+    cout << "stored value in PIptr = " << PIptr << endl;
+    cout << "stored value in the memory being pointed by PIptr = " << *PIptr << endl;
 
-//    foo = foo2 = foo3; // chained assignment operator works from right to left
-
-//    operator=(foo2, Foo{100, 3.14f});
-
-    nothing();
+    cout << sizeof(PI) << endl;
 
 
-//    operator+(4, 5);
-//    add(4, 5);
-    cout << (string("hi") + string("there")) << endl;
+
+
+    // l-value ---> left value
+    // r->value --> right value
+
+//    auto a = 5;   // a --> l-value;    5 --> r-value
+
+    foo( "Hi there" ); // const char[9] --> const char * ---> std::string
+    5;
+
+    return 0;
 }
