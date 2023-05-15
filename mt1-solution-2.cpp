@@ -8,9 +8,11 @@ using namespace std;
 
 template<typename> struct RxConfig;
 
-struct X : std::variant<char, int, double> {
-    using std::variant<char, int, double>::variant;
-};
+//struct X : std::variant<char, int, double> {
+//    using std::variant<char, int, double>::variant;
+//};
+
+using X = std::variant<char, int, double>;
 
 template<typename> struct RxConfig {
     static constexpr auto DOT = X{'.'};
