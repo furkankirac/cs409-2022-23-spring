@@ -28,14 +28,24 @@ concept IsIntegral = is_integral_v<T>;
 //    cout << integral << endl;
 //}
 
+//template<typename Integral>
+//enableIf< is_integral_v<Integral> >::type printIntegralValues(Integral integral)
+//{
+//    cout << integral << endl;
+//}
+
 template<typename Integral>
-enableIf< is_integral_v<Integral> >::type printIntegralValues(Integral integral)
+void printIntegralValues(Integral integral,
+                         typename enableIf<is_integral_v<Integral>>::type* /*whatever*/ = nullptr)
+// when Integral typename is really integral:
+//  enableIf line turns into "void* whatever = nullptr" which is correct syntax
+//  else ::type is not available, hence, skipped by the substitution failure is not an error rule of compiler
 {
     cout << integral << endl;
 }
 
 
-void foo(int* = nullptr)
+void foo(int* whatever = nullptr) // you can ignore writing whatever variable name if you don't use it
 {
 }
 
